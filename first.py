@@ -10,7 +10,7 @@ st.set_option('deprecation.showfileUploaderEncoding', False)
 # Sidebar
 st.sidebar.subheader("Steward")
 stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "MMarcos", "RVillareal"]
-option = st.sidebar.selectbox(
+stewardName = st.sidebar.selectbox(
     'Select steward username',
      stewardlist)
 
@@ -29,7 +29,7 @@ def prep_csv():
 
 # Header
 st.title("SVOC Data Steward Approval Tool")
-'Welcome ', option, '!'
+'Welcome ', stewardName, '!'
 st.write("Compare the values and press Reject or Approve accordingly")
 
 
@@ -47,7 +47,7 @@ try:
     remark = st.text_input("Remarks", )
     timeApproved = datetime.now()
     st.write(timeApproved)
-    st.button("Approve") 
+    st.button("<font color='green'>Approve</font>, unsafe_allow_html=True") 
     st.button("Reject")
 except:
     st.write("ahh")
