@@ -42,15 +42,15 @@ st.write("Compare the values and press Reject or Approve accordingly")
 #table_transposed.style.apply(color_dupes,axis=None, subset=['MATCH_ID', 'RECORD_ID'])
 
 
-st.write(st.table(prep_csv()))
-remark = st.text_input("Remarks", )
-timeApproved = datetime.now()
-st.write(timeApproved)
-
-
-st.button("Approve") 
-st.button("Reject")
-
+try:
+    st.write(st.table(prep_csv()))
+    remark = st.text_input("Remarks", )
+    timeApproved = datetime.now()
+    st.write(timeApproved)
+    st.button("Approve") 
+    st.button("Reject")
+except:
+    st.write("ahh")
 
 
 #print(pd.DataFrame.equals(table_CSV))
