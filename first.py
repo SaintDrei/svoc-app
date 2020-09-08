@@ -39,6 +39,16 @@ def count_matches(x):
     y = x["MATCH_ID"].value_counts()
     return y.sum(axis=0)
 
+
+def showview(x):
+    st.write(st.table(x))
+    remark = st.text_input("Remarks", )
+    timeApproved = datetime.now()
+    st.write(timeApproved)
+    st.button("Approve") 
+    st.button("Reject")
+
+
 st.write(count_matches(table_prepped))
 
 st.write(table_prepped["MATCH_ID"].value_counts())
@@ -55,6 +65,13 @@ for index, row in table_pivots.iterrows():
     st.table(table_comp.T)
     for index, row in table_comp.iterrows():
         st.write("match", index)
+        outable = pd.concat([pasdt, row], axis=1)
+        
+        st.title("SVOC Data Steward Approval Tool")
+        'Welcome ', stewardName, '!'
+        st.write("Compare the values and press Reject or Approve accordingly")
+
+        showview(outable)
         st.table(pd.concat([pasdt, row], axis=1))
     
 st.write("end test")
@@ -74,15 +91,6 @@ st.write("Compare the values and press Reject or Approve accordingly")
 #    df1 = pd.DataFrame(np.where(cond,c1,c2),columns=x.columns,index=x.index)
 #    return df1
 #table_transposed.style.apply(color_dupes,axis=None, subset=['MATCH_ID', 'RECORD_ID'])
-
-def showview(x):
-    st.write(st.table(x))
-    remark = st.text_input("Remarks", )
-    timeApproved = datetime.now()
-    st.write(timeApproved)
-    st.button("Approve") 
-    st.button("Reject")
-
 
 
 try:
