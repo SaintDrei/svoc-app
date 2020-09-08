@@ -18,3 +18,7 @@ Python streamlit app for SVOC approval facilitation.
 * Create guideline widget on sidebar
 * Stylized UI, colors for approve and reject button
 * Generate report: timetaken, cluster count, matched_row count; export to separate CSV or text
+
+# UI Preview
+[](img/Approval_UI1.JPG)
+[](img/Approval_UI.JPG)
