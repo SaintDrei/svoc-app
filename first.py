@@ -17,16 +17,50 @@ stewardName = st.sidebar.selectbox(
  
 st.sidebar.subheader("Upload CSV File")
 file_CSV = st.sidebar.file_uploader("Drag file here or click browse files", type=["csv"])
+
 def prep_csv():
     try:
-        table_CSV = pd.read_csv(file_CSV)
-        table_transposed = table_CSV.T
-        return table_transposed
+        table_CSV = pd.read_csv(file_CSV)        
+        return table_CSV
     except:
         return st.write("""
         ## Please upload CSV on the sidebar
         """)
 
+table_prepped = prep_csv()
+table_transposed = table_prepped.T
+
+def count_clusters(x):
+    counts = x["PIVOT"].value_counts()
+    y = counts.iloc[0]
+    return y
+
+def count_matches(x):
+    y = x["MATCH_ID"].value_counts()
+    return y.sum(axis=0)
+
+st.write(count_matches(table_prepped))
+
+st.write(table_prepped["MATCH_ID"].value_counts())
+
+#for x in count_clusters(table_prepped):
+    #st.write(x)
+st.write('testing table pivots')
+table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
+for index, row in table_pivots.iterrows():
+    st.write(index, row)
+    x = table_prepped['MATCH_ID']
+    table_comp = table_prepped.loc[(x == row["MATCH_ID"]) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING") ]    
+    pasdt = row
+    st.table(table_comp.T)
+    for index, row in table_comp.iterrows():
+        st.write("match", index)
+        st.table(pd.concat([pasdt, row], axis=1))
+    
+st.write("end test")
+st.table(table_pivots.T)
+#st.write(table_prepped[table_prepped>=1].sum(axis=4))    
+#st.write(count_clusters(table_prepped))
 # Header
 st.title("SVOC Data Steward Approval Tool")
 'Welcome ', stewardName, '!'
@@ -41,14 +75,19 @@ st.write("Compare the values and press Reject or Approve accordingly")
 #    return df1
 #table_transposed.style.apply(color_dupes,axis=None, subset=['MATCH_ID', 'RECORD_ID'])
 
-
-try:
-    st.write(st.table(prep_csv()))
+def showview(x):
+    st.write(st.table(x))
     remark = st.text_input("Remarks", )
     timeApproved = datetime.now()
     st.write(timeApproved)
-    st.button("<font color='green'>Approve</font>, unsafe_allow_html=True") 
+    st.button("Approve") 
     st.button("Reject")
+
+
+
+try:
+    showview(table_transposed)
+    st.write(table_transposed["PIVOT"].value_counts())
 except:
     st.write("ahh")
 

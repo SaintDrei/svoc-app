@@ -46,3 +46,11 @@ st.map(filtered_data)
 
 
 filter out zero matches by selecting matchcount>0
+count all pivots
+count all siblings
+
+
+print pivot & match to table
+print table
+apply approve & metadata
+push row to export_df
