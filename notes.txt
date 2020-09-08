@@ -1,0 +1,14 @@
+Hey @Junkrat, welcome to Streamlit!
+
+The st.button function returns True if the button was clicked by the user during the most recent run of your app. So to attach your function to the button, you could do this:
+
+if st.button('add'):
+    result = add(1, 2)
+    st.write('result: %s' % result)
+
+
+    Transpose dataframe
+    https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.transpose.html
+
+
+    
