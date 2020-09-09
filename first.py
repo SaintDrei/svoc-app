@@ -18,14 +18,15 @@ stewardName = st.sidebar.selectbox(
 st.sidebar.subheader("Upload CSV File")
 file_CSV = st.sidebar.file_uploader("Drag file here or click browse files", type=["csv"])
 
+st.title("SVOC Data Steward Approval Tool")
+'Welcome ', stewardName, '!'
 def prep_csv():
     try:
         table_CSV = pd.read_csv(file_CSV)        
         return table_CSV
     except:
-        return st.write("""
-        ## Please upload CSV on the sidebar
-        """)
+        return st.markdown("<font color='red'><strong>Please upload CSV on the sidebar</strong></font>", unsafe_allow_html=True)
+        
 
 table_prepped = prep_csv()
 table_transposed = table_prepped.T
@@ -67,8 +68,6 @@ for index, row in table_pivots.iterrows():
         st.write("match", index)
         outable = pd.concat([pasdt, row], axis=1)
         
-        st.title("SVOC Data Steward Approval Tool")
-        'Welcome ', stewardName, '!'
         st.write("Compare the values and press Reject or Approve accordingly")
 
         showview(outable)
