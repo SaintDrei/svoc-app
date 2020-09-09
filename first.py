@@ -4,7 +4,7 @@ import numpy as np
 import os
 from datetime import datetime
 import time
-
+import threading
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 # Sidebar
@@ -54,8 +54,10 @@ def showButtons():
     st.write(timeApproved)
     if st.button("Approve"):
         return "Approve"
-    if st.button("Reject"):
+    elif st.button("Reject"):
         return "Reject"
+    else:
+        return ""
     
 #def writeRow(row, approval, prev, table_OUT):    
  #   row.loc['STEWARD_APPROVAL'] = approval
@@ -74,8 +76,8 @@ def writeRow(row, approval, prev, table_OUT):
     towrite.TIME_TAKEN = datetime.now() - prev
     st.write(towrite)
         
-def passapproval()
-    
+# def passapproval()
+
 
 st.write(count_matches(table_prepped))
 
@@ -97,11 +99,32 @@ for index, row in table_pivots.iterrows():
         st.write(row.loc['RECORD_ID'])
         st.write("Compare the values and press Reject or Approve accordingly")
         prev = datetime.now()
-        showview(outable)
+        approval_result = threading.Event()
         approval = ""
-        while approval =="":
 
-        writeRow(row, showButtons(), prev, table_OUT)
+        if approval=="":
+            tableview = showview(outable)
+            approval = showButtons()    
+            
+            st.write(wait)
+           # while approval != "APPROVE":
+           #     write = "wait"
+           #     time.sleep(0.1)            
+           # else: 
+           #     write = 'thatsit'
+           #     continue
+        else:
+            del tableview
+            del buttonview
+            break
+        #if approval=="":
+            
+        #elif approval=="APPROVE":
+        #    del tableview
+         #   del buttonview
+         #   writeRow(row, showButtons(), prev, table_OUT)
+         #   approval_result.set()
+          #  continue
 
         st.write("End of match", index)
         #if showview(outable) == "1":
