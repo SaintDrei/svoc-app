@@ -53,9 +53,9 @@ def showButtons():
     timeApproved = datetime.now()
     st.write(timeApproved)
     if st.button("Approve"):
-        return "Approve"
+        approve = "APPROVED"
     elif st.button("Reject"):
-        return "Reject"
+        approve = "REJECTED"
     else:
         return ""
     
@@ -104,9 +104,9 @@ for index, row in table_pivots.iterrows():
 
         if approval=="":
             tableview = showview(outable)
-            approval = showButtons()    
+            approval = input(showButtons())
             
-            st.write(wait)
+            #st.write(wait)
            # while approval != "APPROVE":
            #     write = "wait"
            #     time.sleep(0.1)            
@@ -116,7 +116,7 @@ for index, row in table_pivots.iterrows():
         else:
             del tableview
             del buttonview
-            break
+            st.write('approve')
         #if approval=="":
             
         #elif approval=="APPROVE":
