@@ -57,14 +57,24 @@ def showButtons():
     if st.button("Reject"):
         return "Reject"
     
-def writeRow(row, approval, prev, table_OUT):
-    row.loc['STEWARD_APPROVAL'] = approval
-    row.loc['DATE_APPROVED'] = datetime.now()
-    row.loc['STEWARD'] = stewardName
-    row.loc['TIME_TAKEN'] = datetime.now() - prev
-    st.write(table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID])
-    table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID] = row
-    st.write('test', row)
+#def writeRow(row, approval, prev, table_OUT):    
+ #   row.loc['STEWARD_APPROVAL'] = approval
+  #  row.loc['DATE_APPROVED'] = datetime.now()
+   # row.loc['STEWARD'] = stewardName
+    #row.loc['TIME_TAKEN'] = datetime.now() - prev
+    #st.write(table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID])
+    #table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID] = row
+    #st.write('test', row)
+
+def writeRow(row, approval, prev, table_OUT):   
+    towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
+    towrite.STEWARD_APPROVAL = approval
+    towrite.DATE_APPROVED = datetime.now()
+    towrite.STEWARD = stewardName
+    towrite.TIME_TAKEN = datetime.now() - prev
+    st.write(towrite)
+        
+def passapproval()
     
 
 st.write(count_matches(table_prepped))
@@ -88,7 +98,11 @@ for index, row in table_pivots.iterrows():
         st.write("Compare the values and press Reject or Approve accordingly")
         prev = datetime.now()
         showview(outable)
+        approval = ""
+        while approval =="":
+
         writeRow(row, showButtons(), prev, table_OUT)
+
         st.write("End of match", index)
         #if showview(outable) == "1":
         #    continue
