@@ -47,17 +47,25 @@ def count_matches(x):
 def showview(x):
     st.write(st.table(x))
    # showButtons()
+remark = st.sidebar.text_input("Remarks")
+if st.sidebar.button("Approve"):
+    approval = "APPROVED"
+elif st.sidebar.button("Reject"):
+    approval = "REJECTED"
+else:
+    approval = ""
+st.sidebar.write("0 out of 10")
 
-def showButtons():
+#def showButtons():
     #remarks = st.text_input("Remarks", )
-    timeApproved = datetime.now()
-    st.write(timeApproved)
-    if st.button("Approve"):
-        approve = "APPROVED"
-    elif st.button("Reject"):
-        approve = "REJECTED"
-    else:
-        return ""
+ #   timeApproved = datetime.now()
+  #  st.write(timeApproved)
+   # if st.sidebar.button("Approve"):
+    #    approve = "APPROVED"
+    #elif st.sidebar.button("Reject"):
+    #    approve = "REJECTED"
+    #else:
+     #   return ""
     
 #def writeRow(row, approval, prev, table_OUT):    
  #   row.loc['STEWARD_APPROVAL'] = approval
@@ -101,10 +109,16 @@ for index, row in table_pivots.iterrows():
         prev = datetime.now()
         approval_result = threading.Event()
         approval = ""
-
-        if approval=="":
+        while approval == "":
             tableview = showview(outable)
-            approval = input(showButtons())
+            time.sleep(20)
+        else:
+            st.write(approval)
+            break
+        time.sleep(20)
+        #if approval=="":
+         #   tableview = showview(outable)
+          #  approval = input(approval)
             
             #st.write(wait)
            # while approval != "APPROVE":
@@ -113,10 +127,10 @@ for index, row in table_pivots.iterrows():
            # else: 
            #     write = 'thatsit'
            #     continue
-        else:
-            del tableview
-            del buttonview
-            st.write('approve')
+        #else:
+         #   del tableview
+          #  del buttonview
+           # st.write('approve')
         #if approval=="":
             
         #elif approval=="APPROVE":

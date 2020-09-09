@@ -8,19 +8,24 @@ import streamlit as st
 
 
 hellothere = ""
+counter = 0
 
-while hellothere != "Approve":
-    hellothere = "heyo"
-else:
-    hellothere = "Hey"
-    
-st.write("hellothere")
-if st.button("Approve", "apr"):
+if st.sidebar.button("Approve", "apr"):
     hellothere = "Approve"
-elif st.button("Reject", "rej"):
+elif st.sidebar.button("Reject", "rej"):
     hellothere =  "Reject"
 else:
-    hellothere = "Click something"
+    pass
 
-    hellothere = "DO something"
 st.write(hellothere)
+
+
+while hellothere == "":
+    counter += 1
+    
+    st.write(hellothere, counter)
+    
+else:
+    st.write(hellothere)
+    st.write("Hayoo")
+    counter = counter
