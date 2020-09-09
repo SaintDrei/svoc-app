@@ -87,20 +87,26 @@ pivots = count_clusters(table_prepped)
 st.title("PIVOTS")
 st.table(table_new)
 
-statepivot = SessionState.get(j = 0)
-statematch = SessionState.get(k = 0)
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0)
 while state.j <= pivots:
    
     st.table(table_new.loc[state.j])
     #if approval == "":
     #    pass
     #else:
-    
+    #timebefore = time.time()
     while approval == "":
-        st.write(approval, 'approval')
         time.sleep(.5)
+        state.t += 1
+        st.write('approvee')
     else:
+        #timebefore = statetime
         state.j += 1
+        #timetaken = datetime.now().time() - timebefore
+        
+        st.write(state.j)
+        st.write(state.t)
+        
         
     approval=""        
 
