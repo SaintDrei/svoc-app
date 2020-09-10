@@ -57,7 +57,7 @@ def count_matches(x):
 # Variables
 
 table_prepped = prep_csv()
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(data))
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame())
 if state.tablout is None:
     state.tablout = table_prepped
 else:
@@ -75,7 +75,6 @@ def writeRow(row, approval, prev, table_OUT):
 @st.cache(allow_output_mutation=True)
 def getTabl():
     return pd.DataFrame()
-#tabltest = pd.DataFrame(data)
 
 def writePivot(pivot, steward):
     pivot.STEWARD = steward
@@ -88,7 +87,8 @@ def writePivot(pivot, steward):
     #getTabl().append(pivot, ignore_index=True)
     #getTabl().append("shark":"sharks", ignore_index=True)
     #pd.concat([getTabl(), pivot], axis=1)
-    getTabl().append({"stuff":"stuff"}, ignore_index=True)
+    
+    state.tablout = state.tablout.append(pivot, ignore_index=True)
     
 
 def modRow(steward, record, approval, prev):
@@ -142,11 +142,14 @@ while state.j <= pivots:
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
     timeprev = datetime.now()
     writePivot(pivot, stewardName)
-    st.write(getTabl())
+    st.write(state.tablout)
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
         st.write(outable)
+        state.tablout.append({"stuff":"stuff"}, ignore_index=True)
+        st.write("stuff")
+        st.write(state.tablout)
         #drawtable(outable)
         #st.table(state.tablout)
         while approval == "":
@@ -156,7 +159,6 @@ while state.j <= pivots:
         else:
            # writeRow(match, approval, timeprev, state.tablout)
             approval = ""
-            outable.empty()
             state.k += 1
             state.r += 1
             
