@@ -64,11 +64,10 @@ table_transposed = table_prepped.T
 table_OUT = table_prepped
 matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
 st.sidebar.write(state.r, " out of ", matches)
-
+totalrows = len(table_prepped.index)
 st.title("SVOC Data Steward Approval Tool")
 'Welcome ', stewardName, '!'
 
-st.write("Num of rows", count_matches(table_prepped))
 
 table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
 data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
@@ -83,7 +82,11 @@ else:
     pass
 
 pivots = count_clusters(table_prepped)
-
+totalpivots = len(table_pivots.index)
+totalmatch = matches + totalpivots
+totalclusters = pivots
+def drawtable(tableout):
+    st.table(tableout)
 def prepmatches(matchid):
     table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
     i = 0
@@ -97,38 +100,28 @@ def prepmatches(matchid):
     #prepmatches.count = count_matches(table_matches_prepped)
     return table_matches_prepped
 
-#for index, row in table_pivots.iterrows():
- #   st.write(index, row)
-  #  input(st.button("Continue"))
-st.title("PIVOTS")
-st.table(table_new)
-
 while state.j <= pivots:
     pivot = table_new.loc[state.j]
-    st.table(pivot)
-    #if approval == "":
-    #    pass
-    #else:
-    #timebefore = time.time()
     matchid = pivot['MATCH_ID']
-    st.write('matchid is', matchid)
     table_matches = prepmatches(matchid)
     matchto = count_matches(table_matches)
-    st.write("matches are", matchto)
-    st.table(table_matches)
+    st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
-        st.table(outable)
+        drawtable(outable)
         while approval == "":
             time.sleep(.5)
             state.t += 1
-            st.write('approvee')
+            st.write(state.t)
         else:
         #timebefore = statetime
+            
             approval = ""
             state.k += 1
             state.r += 1
+            del outable
+            
             
         #timetaken = datetime.now().time() - timebefore
         
