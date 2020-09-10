@@ -8,6 +8,8 @@ import threading
 import SessionState
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
+
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0)
 # Sidebar
 st.sidebar.subheader("Steward")
 stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "MMarcos", "RVillareal"]
@@ -60,8 +62,8 @@ def writeRow(row, approval, prev, table_OUT):
 table_prepped = prep_csv()
 table_transposed = table_prepped.T
 table_OUT = table_prepped
-matches = count_matches(table_prepped)
-st.sidebar.write("0 out of ", matches)
+matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
+st.sidebar.write(state.r, " out of ", matches)
 
 st.title("SVOC Data Steward Approval Tool")
 'Welcome ', stewardName, '!'
@@ -101,7 +103,6 @@ def prepmatches(matchid):
 st.title("PIVOTS")
 st.table(table_new)
 
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0)
 while state.j <= pivots:
     pivot = table_new.loc[state.j]
     st.table(pivot)
@@ -115,7 +116,7 @@ while state.j <= pivots:
     matchto = count_matches(table_matches)
     st.write("matches are", matchto)
     st.table(table_matches)
-    while state.k <= matchto:
+    while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
         st.table(outable)
@@ -125,14 +126,19 @@ while state.j <= pivots:
             st.write('approvee')
         else:
         #timebefore = statetime
+            approval = ""
             state.k += 1
+            state.r += 1
             
         #timetaken = datetime.now().time() - timebefore
         
     else:
         state.j += 1
+        state.k = 0
         st.write(state.j)
         st.write(state.t)
+        #INsert review block
+        break
         
         
     approval=""        
