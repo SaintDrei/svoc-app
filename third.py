@@ -9,7 +9,9 @@ import SessionState
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0)
+data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
+# , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+
 # Sidebar
 st.sidebar.subheader("Steward")
 stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "MMarcos", "RVillareal"]
@@ -49,6 +51,18 @@ def count_matches(x):
     y = x["MATCH_ID"].value_counts()
     return y.sum(axis=0)
 
+
+
+        
+# Variables
+
+table_prepped = prep_csv()
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(data))
+if state.tablout is None:
+    state.tablout = table_prepped
+else:
+    st.write("tablout is written")
+    st.write(state.tablout)
 def writeRow(row, approval, prev, table_OUT):   
     towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
     towrite.STEWARD_APPROVAL = approval
@@ -56,12 +70,16 @@ def writeRow(row, approval, prev, table_OUT):
     towrite.STEWARD = stewardName
     towrite.TIME_TAKEN = datetime.now() - prev
     st.write(towrite)
-        
-# Variables
+def writePivot(pivot, steward, tabl):
+    pivot.loc['STEWARD'] = steward
+    pivot.loc['DATE_APPROVED'] = datetime.now()
+    pivot.loc['STEWARD_APPROVAL'] = "PIVOT"
+    state.tablout.append({"STEWARD":steward, "DATE_APPROVED":datetime.now(), 'STEWARD_APPROVAL': "PIVOT"}, ignore_index=True)
 
-table_prepped = prep_csv()
+def modRow():
+
+    pass
 table_transposed = table_prepped.T
-table_OUT = table_prepped
 matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
 st.sidebar.write(state.r, " out of ", matches)
 totalrows = len(table_prepped.index)
@@ -70,7 +88,6 @@ st.title("SVOC Data Steward Approval Tool")
 
 
 table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
-data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
 
 table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 
@@ -99,6 +116,7 @@ def prepmatches(matchid):
         pass
     #prepmatches.count = count_matches(table_matches_prepped)
     return table_matches_prepped
+table_OUT = table_prepped
 
 while state.j <= pivots:
     pivot = table_new.loc[state.j]
@@ -106,25 +124,24 @@ while state.j <= pivots:
     table_matches = prepmatches(matchid)
     matchto = count_matches(table_matches)
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
+    timeprev = datetime.now()
+    writePivot(pivot, stewardName, state.tablout)
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
-        drawtable(outable)
+        st.write(outable)
+        #drawtable(outable)
+        #st.table(state.tablout)
         while approval == "":
             time.sleep(.5)
             state.t += 1
             st.write(state.t)
         else:
-        #timebefore = statetime
-            
+           # writeRow(match, approval, timeprev, state.tablout)
             approval = ""
             state.k += 1
             state.r += 1
-            del outable
             
-            
-        #timetaken = datetime.now().time() - timebefore
-        
     else:
         state.j += 1
         state.k = 0
@@ -132,12 +149,7 @@ while state.j <= pivots:
         st.write(state.t)
         #INsert review block
         break
-        
-        
-    approval=""        
-
-    
-   
-    
+               
+    approval=""     
 else:
     st.write("Done")
