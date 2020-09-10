@@ -72,6 +72,7 @@ table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_pr
 data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
 
 table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+
 i = 0
 for index, row in table_pivots.iterrows():
     table_new.loc[i] = row
@@ -81,6 +82,19 @@ else:
 
 pivots = count_clusters(table_prepped)
 
+def prepmatches(matchid):
+    table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
+    i = 0
+    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+    
+    for index, row in table_matches.iterrows():
+        table_matches_prepped.loc[i] = row
+        i+=1
+    else:
+        pass
+    #prepmatches.count = count_matches(table_matches_prepped)
+    return table_matches_prepped
+
 #for index, row in table_pivots.iterrows():
  #   st.write(index, row)
   #  input(st.button("Continue"))
@@ -89,21 +103,34 @@ st.table(table_new)
 
 state = SessionState.get(j = 0, t = 0,ta = 0, k = 0)
 while state.j <= pivots:
-   
-    st.table(table_new.loc[state.j])
+    pivot = table_new.loc[state.j]
+    st.table(pivot)
     #if approval == "":
     #    pass
     #else:
     #timebefore = time.time()
-    while approval == "":
-        time.sleep(.5)
-        state.t += 1
-        st.write('approvee')
-    else:
+    matchid = pivot['MATCH_ID']
+    st.write('matchid is', matchid)
+    table_matches = prepmatches(matchid)
+    matchto = count_matches(table_matches)
+    st.write("matches are", matchto)
+    st.table(table_matches)
+    while state.k <= matchto:
+        match = table_matches.loc[state.k]
+        outable = pd.concat([pivot, match], axis = 1)
+        st.table(outable)
+        while approval == "":
+            time.sleep(.5)
+            state.t += 1
+            st.write('approvee')
+        else:
         #timebefore = statetime
-        state.j += 1
+            state.k += 1
+            
         #timetaken = datetime.now().time() - timebefore
         
+    else:
+        state.j += 1
         st.write(state.j)
         st.write(state.t)
         

@@ -100,6 +100,7 @@ for index, row in table_pivots.iterrows():
     x = table_prepped['MATCH_ID']
     table_comp = table_prepped.loc[(x == row["MATCH_ID"]) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING") ]    
     pasdt = row
+    st.write(x)
     st.table(table_comp.T)
     for index, row in table_comp.iterrows():
         st.write("match", index)
