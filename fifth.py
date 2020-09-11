@@ -145,20 +145,23 @@ while state.j <= pivots:
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
-        st.write(outable)
-        st.write("stuff")
-        
-        while approval == "":
-            time.sleep(.5)
-            state.t += 1
-            st.write(state.t)
-            state.taken +=1
+
+        if approval =="":
+            st.write(outable)
+            while approval == "":
+                time.sleep(.5)
+                state.t += 1
+                st.write(state.t)
+                state.taken +=1
+            else:
+                modRow(match, approval, state.taken)
+                state.taken = 0
+                
         else:
-            modRow(match, approval, state.taken)
-            state.taken = 0
             approval = ""
             state.k += 1
             state.r += 1
+            st.write("Whuuut")
                         
             
     else:

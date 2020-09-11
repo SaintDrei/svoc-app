@@ -23,6 +23,7 @@ Python streamlit app for SVOC approval facilitation.
 * Stylized UI, colors for approve and reject button
 * Generate report: timetaken, cluster count, matched_row count; export to separate CSV or text or copy button
 * Progress bar to ~~show rows completed out of total matched_rows~~
+* Review cluster after a cluster loop
 
 # UI Preview
 ![](img/Approval_UI.15.JPG)
