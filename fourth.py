@@ -139,17 +139,13 @@ while state.j <= pivots:
     table_matches = prepmatches(matchid)
     matchto = count_matches(table_matches)
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
-    timeprev = datetime.now()
-    st.write(tablePivots())
+        
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
         st.write(outable)
         state.tablout.append({"stuff":"stuff"}, ignore_index=True)
         st.write("stuff")
-        st.write(state.tablout)
-        #drawtable(outable)
-        #st.table(state.tablout)
         
         while approval == "":
             time.sleep(.5)
@@ -158,7 +154,6 @@ while state.j <= pivots:
             state.taken +=1
         else:
             modRow(match, approval, state.taken)
-           # writeRow(match, approval, timeprev, state.tablout)
             state.taken = 0
             approval = ""
             state.k += 1
@@ -170,7 +165,7 @@ while state.j <= pivots:
         state.k = 0
         st.write(state.j)
         st.write(state.t)
-        #INsert review block
+        outable = pd.empty()
         break
                
     approval=""     
