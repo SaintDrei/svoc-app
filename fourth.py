@@ -58,11 +58,7 @@ def count_matches(x):
 
 table_prepped = prep_csv()
 state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0)
-if state.tablout is None:
-    state.tablout = table_prepped
-else:
-    st.write("tablout is written")
-    st.write(state.tablout)
+    
 def writeRow(row, approval, prev, table_OUT):   
     towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
     towrite.STEWARD_APPROVAL = approval
@@ -70,11 +66,6 @@ def writeRow(row, approval, prev, table_OUT):
     towrite.STEWARD = stewardName
     towrite.TIME_TAKEN = datetime.now() - prev
     st.write(towrite)
-
-
-@st.cache(allow_output_mutation=True)
-def getTabl():
-    return pd.DataFrame()
 
 def writePivot(pivot, steward):
     pivot.STEWARD = steward
