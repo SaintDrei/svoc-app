@@ -57,7 +57,7 @@ def count_matches(x):
 # Variables
 
 table_prepped = prep_csv()
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame())
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0)
 if state.tablout is None:
     state.tablout = table_prepped
 else:
@@ -89,12 +89,15 @@ def writePivot(pivot, steward):
     #pd.concat([getTabl(), pivot], axis=1)
     
     state.tablout = state.tablout.append(pivot, ignore_index=True)
-    
 
-def modRow(steward, record, approval, prev):
-    record.loc['STEWARD'] = steward
-    record.loc['DATE_APPROVED'] = datetime.now()
-    
+
+def modRow(record, approval, taken):
+    record.STEWARD = stewardName
+    record.DATE_APPROVED = datetime.now()
+    record.STEWARD_APPROVAL = approval
+    record.TIME_TAKEN = taken
+    state.tablout = state.tablout.append(record, ignore_index = True)
+
 table_transposed = table_prepped.T
 matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
 st.sidebar.write(state.r, " out of ", matches)
@@ -106,13 +109,17 @@ st.title("SVOC Data Steward Approval Tool")
 table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
 
 table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
-
-i = 0
-for index, row in table_pivots.iterrows():
-    table_new.loc[i] = row
-    i+=1
-else:
-    pass
+def tablePivots():    
+    i = 0
+    for index, row in table_pivots.iterrows():
+        row.STEWARD_APPROVAL = "PIVOT"
+        row.STEWARD = stewardName
+        row.DATE_APPROVED = datetime.now()
+        row.TIME_TAKEN = 0
+        table_new.loc[i] = row
+        i+=1
+    else:
+        return table_new
 
 pivots = count_clusters(table_prepped)
 totalpivots = len(table_pivots.index)
@@ -132,17 +139,17 @@ def prepmatches(matchid):
         pass
     #prepmatches.count = count_matches(table_matches_prepped)
     return table_matches_prepped
+
 table_OUT = table_prepped
 
 while state.j <= pivots:
-    pivot = table_new.loc[state.j]
+    pivot = tablePivots().loc[state.j]
     matchid = pivot['MATCH_ID']
     table_matches = prepmatches(matchid)
     matchto = count_matches(table_matches)
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
     timeprev = datetime.now()
-    writePivot(pivot, stewardName)
-    st.write(state.tablout)
+    st.write(tablePivots())
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
@@ -152,12 +159,16 @@ while state.j <= pivots:
         st.write(state.tablout)
         #drawtable(outable)
         #st.table(state.tablout)
+        
         while approval == "":
             time.sleep(.5)
             state.t += 1
             st.write(state.t)
+            state.taken +=1
         else:
+            modRow(match, approval, state.taken)
            # writeRow(match, approval, timeprev, state.tablout)
+            state.taken = 0
             approval = ""
             state.k += 1
             state.r += 1

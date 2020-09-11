@@ -4,7 +4,7 @@ Python streamlit app for SVOC approval facilitation.
 # Agenda
 * ~~Create loading loop~~
 * ~~Auto-tag PIVOTS & SIBLINGS as PIVOT~~
-* Create timetaken function
+* ~~Create timetaken function~~
 * Create filter widget to search for clusters/records
 * Create export function
     * Commit all edited rows to datatable
