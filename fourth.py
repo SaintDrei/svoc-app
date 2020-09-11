@@ -67,8 +67,8 @@ def writeRow(row, approval, prev, table_OUT):
     towrite.TIME_TAKEN = datetime.now() - prev
     st.write(towrite)
 
-def writePivot(pivot, steward):
-    pivot.STEWARD = steward
+def writePivot(pivot):
+    pivot.STEWARD = stewardName
     pivot.DATE_APPROVED = datetime.now()
     pivot.STEWARD_APPROVAL = "PIVOT"
     #pivot.loc['STEWARD'] = steward
@@ -130,6 +130,8 @@ def prepmatches(matchid):
         pass
     #prepmatches.count = count_matches(table_matches_prepped)
     return table_matches_prepped
+def getcluster(clusterid):
+    return state.tablout.loc[(state.tablout["CLUSTER_ID"] == clusterid)]
 
 table_OUT = table_prepped
 
@@ -139,12 +141,11 @@ while state.j <= pivots:
     table_matches = prepmatches(matchid)
     matchto = count_matches(table_matches)
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
-        
+    proceed = ""
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
         st.write(outable)
-        state.tablout.append({"stuff":"stuff"}, ignore_index=True)
         st.write("stuff")
         
         while approval == "":
@@ -158,16 +159,21 @@ while state.j <= pivots:
             approval = ""
             state.k += 1
             state.r += 1
-            
+                        
             
     else:
+        if proceed == "":
+            clusterid = pivot.CLUSTER_ID
+            writePivot(pivot)
+            st.write(getcluster(clusterid))
+            
+
         state.j += 1
         state.k = 0
         st.write(state.j)
         st.write(state.t)
-        outable = pd.empty()
         break
-               
-    approval=""     
+                 
 else:
-    st.write("Done")
+    st.write("All matches complete!")
+    #PRINT OUT report data
