@@ -6,6 +6,7 @@ from datetime import datetime
 import time
 import threading
 import SessionState
+import base64
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -132,10 +133,17 @@ def prepmatches(matchid):
     return table_matches_prepped
 def getcluster(clusterid):
     return state.tablout.loc[(state.tablout["CLUSTER_ID"] == clusterid)]
+def get_download(df):
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(
+        csv.encode()
+    ).decode()
+    return f'<a href="data:file/csv;base64,{b64}" download="myfilename.csv">Download csv file</a>'
+
 
 table_OUT = table_prepped
 
-while state.j <= pivots:
+while state.j < pivots:
     pivot = tablePivots().loc[state.j]
     matchid = pivot['MATCH_ID']
     table_matches = prepmatches(matchid)
@@ -162,24 +170,34 @@ while state.j <= pivots:
                         
             
     else:
+       
         if proceed == "":
+            if st.button("Next"):
+                proceed = "Next"
+            
             clusterid = pivot.CLUSTER_ID
             writePivot(pivot)
             st.write("tablout")
             st.write(state.tablout)
             st.write("cluster")
             st.write(getcluster(clusterid))
-            time.sleep
+            while proceed == "":
+                time.sleep(0.5)
+                st.write('sleeping')
+            else:
+                state.j += 1
+                state.k = 0
+                st.write(state.j)
+                st.write(state.t)
         else: 
-            state.j += 1
-            state.k = 0
-            st.write(state.j)
-            st.write(state.t)
-            break
+            pass
+        
+                
             
 
         
                  
 else:
     st.write("All matches complete!")
+    st.markdown(get_download(state.tablout), unsafe_allow_html=True)
     #PRINT OUT report data

@@ -57,7 +57,7 @@ def count_matches(x):
 # Variables
 
 table_prepped = prep_csv()
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0)
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 1, tablout = pd.DataFrame(), taken = 0)
     
 def writeRow(row, approval, prev, table_OUT):   
     towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
@@ -133,6 +133,14 @@ def prepmatches(matchid):
 def getcluster(clusterid):
     return state.tablout.loc[(state.tablout["CLUSTER_ID"] == clusterid)]
 
+nextclust = ""
+
+def nextclust():
+    if st.button("Next"):
+        nextclust = "next"
+    else: 
+        pass
+
 table_OUT = table_prepped
 
 while state.j <= pivots:
@@ -141,7 +149,7 @@ while state.j <= pivots:
     table_matches = prepmatches(matchid)
     matchto = count_matches(table_matches)
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
-    proceed = ""
+    nextcluster = False
     while state.k < matchto:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
@@ -152,26 +160,35 @@ while state.j <= pivots:
                 time.sleep(.5)
                 state.t += 1
                 st.write(state.t)
-                state.taken +=1
             else:
-                modRow(match, approval, state.taken)
-                state.taken = 0
+                modRow(match, approval, state.t)
+                state.t = 0
                 
         else:
             approval = ""
             state.k += 1
             state.r += 1
             st.write("Whuuut")
+            
                         
             
     else:
-        if proceed == "":
+        if nextclust == "":
             clusterid = pivot.CLUSTER_ID
             writePivot(pivot)
+            st.write(state.tablout)
             st.write(getcluster(clusterid))
+            nextclust()
+            while nextclust == "":
+                time.sleep(.5)
+            else:
+                st.write("Cluster true!")    
         else: 
+            approval = ""
             state.j += 1
             state.k = 0
+            st.write("Cluster End")
+            st.write(state.tablout)
             st.write(state.j)
             st.write(state.t)
             break
@@ -180,5 +197,6 @@ while state.j <= pivots:
         
                  
 else:
+    state.tablout.to_csv("test_output.csv", index=False)
     st.write("All matches complete!")
     #PRINT OUT report data
