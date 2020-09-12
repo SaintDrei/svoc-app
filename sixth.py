@@ -49,16 +49,68 @@ totalpivots = len(table_pivots.index)
 totalmatch = matches + totalpivots
 totalclusters = pivots
 
+# FUNCTIONS
+
+def writePivot(pivot, steward):
+    pivot.STEWARD = steward
+    pivot.DATE_APPROVED = datetime.now()
+    pivot.STEWARD_APPROVAL = "PIVOT"
+    state.tablout = state.tablout.append(pivot, ignore_index=True)
+
+def modRow(record, approval, taken, steward):
+    record.STEWARD = steward
+    record.DATE_APPROVED = datetime.now()
+    record.STEWARD_APPROVAL = approval
+    record.TIME_TAKEN = taken
+    state.tablout = state.tablout.append(record, ignore_index = True)
+
+
+def tableReports(rows, clusters, pivots, matches):
+    taken = state.tablout['TIME_TAKEN'].sum()
+    data = [[rows, clusters, pivots, matches, taken]]
+    report = pd.DataFrame(data, columns=["ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "TIME_TAKEN"])
+    return report
+
+def tableCluster(clusterid, tablout):
+    return tablout.loc[(tablout["CLUSTER_ID"] == clusterid)]
+
+table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+def tablePivots(table_pivots, steward):    
+    i = 0
+    for index, row in table_pivots.iterrows():
+        row.STEWARD_APPROVAL = "PIVOT"
+        row.STEWARD = steward
+        row.DATE_APPROVED = datetime.now()
+        row.TIME_TAKEN = 0
+        table_new.loc[i] = row
+        i+=1
+    else:
+        return table_new
+
+
+def tableMatches(matchid, table_prepped):
+    table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
+    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+    
+    for index, row in table_matches.iterrows():
+        table_matches_prepped.loc[index] = row
+        
+    else:
+        pass
+    #prepmatches.count = count_matches(table_matches_prepped)
+    return table_matches_prepped
+
 
 # DISPLAY WELCOME
 st.title("SVOC Data Steward Approval Tool")
 'Welcome ', stewardName, '!'
-
+st.write("TABLOUT")
+st.write(state.tablout)
 
 while state.j < pivots:
-    pivot = hel.tablePivots(table_pivots, stewardName).loc[state.j]
+    pivot = tablePivots(table_pivots, stewardName).loc[state.j]
     matchid = pivot['MATCH_ID']
-    table_matches = hel.tableMatches(matchid, table_prepped)
+    table_matches = tableMatches(matchid, table_prepped)
     matchto = hel.count_matches(table_matches)
     st.write('MATCH_ID: ', matchid, "    Match Count: ", matchto)
     proceed = ""
@@ -79,7 +131,7 @@ while state.j < pivots:
                 st.write("HALAAA")
                 
         else:
-            hel.modRow(match, approval, state.taken, stewardName, state.tablout)
+            modRow(match, approval, state.taken, stewardName)
             state.taken = 0
             approval = ""
             state.k += 1
@@ -93,11 +145,11 @@ while state.j < pivots:
             else:
                 pass
             clusterid = pivot.CLUSTER_ID
-            hel.writePivot(pivot, state.tablout, stewardName)
+            writePivot(pivot, stewardName)
             st.write("tablout")
             st.write(state.tablout)
             st.write("cluster")
-            st.write(hel.tableCluster(clusterid, state.tablout))
+            st.write(tableCluster(clusterid, state.tablout))
             while proceed == "":
                 time.sleep(0.5)
                 st.write('sleeping')
@@ -114,6 +166,6 @@ while state.j < pivots:
                  
 else:
     st.write("All matches complete!")
-    st.write(hel.tableReports(state.tablout, totalrows, totalclusters, totalpivots, totalmatch))
+    st.write(tableReports(state.tablout, totalrows, totalclusters, totalpivots, totalmatch))
     st.markdown(hel.get_download(state.tablout), unsafe_allow_html=True)
     #PRINT OUT report data

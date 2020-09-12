@@ -3,6 +3,7 @@ import streamlit as st
 import base64
 from datetime import datetime
 
+
 # VARIABLES
 
 
@@ -25,14 +26,6 @@ def count_matches(x):
 
 
 # WRITE ROWS
-def writeRow(row, approval, prev, table_OUT):   
-    towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
-    towrite.STEWARD_APPROVAL = approval
-    towrite.DATE_APPROVED = datetime.now()
-    towrite.STEWARD = stewardName
-    towrite.TIME_TAKEN = datetime.now() - prev
-    return st.write(towrite)
-
 def writePivot(pivot, tablout, steward):
     pivot.STEWARD = steward
     pivot.DATE_APPROVED = datetime.now()
@@ -81,12 +74,11 @@ def tableCluster(clusterid, tablout):
 
 def tableMatches(matchid, table_prepped):
     table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
-    i = 0
     table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
     
-    for row in table_matches.iterrows():
-        table_matches_prepped.loc[i] = row
-        i+=1
+    for index, row in table_matches.iterrows():
+        table_matches_prepped.loc[index] = row
+        
     else:
         pass
     #prepmatches.count = count_matches(table_matches_prepped)
