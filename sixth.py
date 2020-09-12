@@ -10,7 +10,7 @@ import base64
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
+data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
 # , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 
 # Sidebar
@@ -22,6 +22,7 @@ stewardName = st.sidebar.selectbox(
 approval = ""
 st.sidebar.subheader("Upload CSV File")
 file_CSV = st.sidebar.file_uploader("Drag file here or click browse files", type=["csv"])
+
 remark = st.sidebar.text_input("Remarks")
 if st.sidebar.button("Approve"):
     approval = "APPROVED"
@@ -72,22 +73,15 @@ def writePivot(pivot):
     pivot.STEWARD = stewardName
     pivot.DATE_APPROVED = datetime.now()
     pivot.STEWARD_APPROVAL = "PIVOT"
-    #pivot.loc['STEWARD'] = steward
-    #pivot.loc['DATE_APPROVED'] = datetime.now()
-    #pivot.loc['STEWARD_APPROVAL'] = "PIVOT"
-    #"STEWARD":steward, "DATE_APPROVED":datetime.now(), 'STEWARD_APPROVAL': "PIVOT"}
-    #getTabl().append(pivot, ignore_index=True)
-    #getTabl().append("shark":"sharks", ignore_index=True)
-    #pd.concat([getTabl(), pivot], axis=1)
-    
     state.tablout = state.tablout.append(pivot, ignore_index=True)
 
 
-def modRow(record, approval, taken):
+def modRow(record, approval, taken, remarks):
     record.STEWARD = stewardName
     record.DATE_APPROVED = datetime.now()
     record.STEWARD_APPROVAL = approval
     record.TIME_TAKEN = taken
+    record.REMARKS = remarks
     state.tablout = state.tablout.append(record, ignore_index = True)
 
 table_transposed = table_prepped.T
@@ -100,7 +94,7 @@ st.title("SVOC Data Steward Approval Tool")
 
 table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
 
-table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 def tablePivots():    
     i = 0
     for index, row in table_pivots.iterrows():
@@ -122,7 +116,7 @@ def drawtable(tableout):
 def prepmatches(matchid):
     table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
     i = 0
-    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
     
     for index, row in table_matches.iterrows():
         table_matches_prepped.loc[i] = row
@@ -140,6 +134,11 @@ def get_download(df):
     ).decode()
     return f'<a href="data:file/csv;base64,{b64}" download="myfilename.csv">Download csv file</a>'
 
+def tableReports(tablout, rows, clusters, pivots, matches):
+    taken = tablout['TIME_TAKEN'].sum()
+    data = [[rows, clusters, pivots, matches, taken]]
+    report = pd.DataFrame(data, columns=["ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "TIME_TAKEN"])
+    return report
 
 table_OUT = table_prepped
 
@@ -162,9 +161,10 @@ while state.j < pivots:
             st.write(state.t)
             state.taken +=1
         else:
-            modRow(match, approval, state.taken)
+            modRow(match, approval, state.taken, remark)
             state.taken = 0
             approval = ""
+            remark = ""
             state.k += 1
             state.r += 1
                         
@@ -174,26 +174,32 @@ while state.j < pivots:
         if proceed == "":
             if st.button("Next"):
                 proceed = "Next"
-            
+            else:
+                pass
+
+           
             clusterid = pivot.CLUSTER_ID
-            writePivot(pivot)
-            st.write("tablout")
-            st.write(state.tablout)
-            st.write("cluster")
-            st.write(getcluster(clusterid))
+          
             while proceed == "":
                 time.sleep(0.5)
                 st.write('sleeping')
             else:
+                writePivot(pivot)
+                st.write("tablout")
+                st.write(state.tablout)
+                st.write("cluster")
+                st.write(getcluster(clusterid))
                 state.j += 1
                 state.k = 0
                 st.write(state.j)
                 st.write(state.t)
         else: 
+            
             pass
             
                  
 else:
     st.write("All matches complete!")
+    st.write(tableReports(state.tablout, totalrows, totalclusters, totalpivots, totalmatch))
     st.markdown(get_download(state.tablout), unsafe_allow_html=True)
     #PRINT OUT report data

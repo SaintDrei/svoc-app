@@ -14,6 +14,7 @@ Python streamlit app for SVOC approval facilitation.
 * Optimize program by creating functions
 * Eliminate duplicate tables inside while loop
 * Eliminate endless sleep without st.write() on end of approval_wait loop
+* Fix remarks input
 
 ## Optional Features
 * Include dupe highlighting for QOL(Easier match spotting by glance)
@@ -21,7 +22,7 @@ Python streamlit app for SVOC approval facilitation.
 * Create approval suggestions based on current guidelines
 * Create guideline widget on sidebar
 * Stylized UI, colors for approve and reject button
-* Generate report: ~~timetaken~~, cluster count, matched_row count; export to separate CSV or text or copy button
+* ~~Generate report: timetaken, cluster count, matched_row count;~~ export to separate CSV or text or copy button
 * Progress bar to ~~show rows completed out of total matched_rows~~
 * ~~Review cluster after a cluster loop~~
 
