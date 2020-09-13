@@ -176,11 +176,13 @@ while state.j < pivots:
     else:
        
         if proceed == "":
+            
             if st.button("Next"):
                 proceed = "Next"
                 state.j += 1
                 state.k = 0
             else:        
+                writePivot(pivot)
                 clusterid = pivot.CLUSTER_ID
                 st.write("tablout")
                 st.write(state.tablout)
@@ -192,13 +194,13 @@ while state.j < pivots:
                 else:
                     pass
         else: 
-            writePivot(pivot)
-            st.write(state.j)
+            
             st.write(state.t)    
+            st.write(state.j)
             
                  
 else:
     st.write("All matches complete!")
-    st.write(tableReports(state.tablout, totalrows, totalclusters, totalpivots, totalmatch))
+    st.table(tableReports(state.tablout, totalrows, totalclusters, totalpivots, totalmatch))
     st.markdown(get_download(state.tablout), unsafe_allow_html=True)
     #PRINT OUT report data
