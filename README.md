@@ -21,4 +21,9 @@ Python streamlit app for SVOC approval facilitation.
 * Minor delay in viewing next record
 
 # UI Preview
-![](img/Approval_UI.15.JPG)
+![](img/9.1.JPG)
+![](img/9.2.JPG)
+![](img/9.3.JPG)
+![](img/9.4.JPG)
+![](img/9-cluster-review.JPG)
+![](img/9-end.JPG)
