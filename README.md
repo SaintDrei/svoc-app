@@ -14,7 +14,7 @@ Python streamlit app for SVOC approval facilitation.
 * Optimize program by creating functions
 * Eliminate duplicate tables inside while loop
 * Eliminate endless sleep without st.write() on end of approval_wait loop
-* Fix remarks input
+* Fix remarks clearing. Add remarks to sessionstate
 
 ## Optional Features
 * Include dupe highlighting for QOL(Easier match spotting by glance)
