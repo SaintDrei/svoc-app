@@ -12,8 +12,8 @@ Python streamlit app for SVOC approval facilitation.
 * Create BAT files for setup, init
 * Separate rendering of view dependent on filtering or first approval.
 * Optimize program by creating functions
-* Eliminate duplicate tables inside while loop
-* Eliminate endless sleep without st.write() on end of approval_wait loop
+* Eliminate duplicate Next button
+* ~~Eliminate endless sleep without st.write() on end of approval_wait loop~~
 * Fix remarks clearing. Add remarks to sessionstate
 
 ## Optional Features
