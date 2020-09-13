@@ -36,6 +36,8 @@ else:
 # Sidebar end
 
 #Functions
+st.title("SVOC Data Steward Approval Tool")
+'Welcome ', stewardName, '!'
 def prep_csv():
     try:
         table_CSV = pd.read_csv(file_CSV)        
@@ -88,8 +90,7 @@ table_transposed = table_prepped.T
 matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
 st.sidebar.write(state.r, " out of ", matches)
 totalrows = len(table_prepped.index)
-st.title("SVOC Data Steward Approval Tool")
-'Welcome ', stewardName, '!'
+
 
 
 table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
@@ -155,14 +156,14 @@ while state.j < pivots:
         st.write("Match iteration " + str(state.k))
  
         if approval =="":
-            st.write(pivots)
-            st.write(tablePivots())
-            st.write(outable)
+            st.table(outable)
+            
+            ttaken = st.text("Time taken: " + str(state.taken))
             while approval == "":
                 time.sleep(.5)
                 state.t += 1
-                state.taken +=1
-                st.write(state.taken)
+                state.taken += 0.5
+                ttaken.text("Time taken: " + str(state.taken))
             else:
                 
                 pass
@@ -186,13 +187,17 @@ while state.j < pivots:
             else:        
                 writePivot(pivot)
                 clusterid = pivot.CLUSTER_ID
-                st.write("tablout")
-                st.write(state.tablout)
-                st.write("cluster")
+                st.markdown("""
+                ## Cluster Review
+                Press Next to proceed
+                """)
                 st.write(getcluster(clusterid))
+                taken = 0
+                waitmessage = st.text("Time taken: " + str(taken))
                 while proceed == "":
                     time.sleep(0.5)
-                    st.write('sleeping')
+                    taken +=1
+                    waitmessage.text("Time taken: " + str(taken))
                 else:
                     pass
         else: 
