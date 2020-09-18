@@ -14,6 +14,7 @@ Python streamlit app for SVOC approval facilitation.
 * Create separate Second Approval Script to:
     * Replace Approval writing
     * Additional Checkbox to tag Errors  or autotag them based on changes
+* Fix untagged pivot showing up as matched record
 
 ## Optional Features
 * Include dupe highlighting for QOL(Easier match spotting by glance)

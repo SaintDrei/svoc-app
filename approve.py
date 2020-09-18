@@ -88,9 +88,9 @@ def modRow(record, approvalstatus, taken, remarks):
 
 table_transposed = table_prepped.T
 matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
-st.sidebar.write(state.r, " out of ", matches)
-totalrows = len(table_prepped.index)
 
+totalrows = len(table_prepped.index)
+totalcrows = len(table_prepped.loc[(table_prepped["CLUSTER_ID"].isnull() == False)])
 
 
 table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
@@ -116,6 +116,8 @@ def tablePivots():
 pivots = count_clusters(tablePivots())
 totalpivots = len(table_pivots.index)
 totalmatch = matches + totalpivots
+matches = totalcrows - pivots
+st.sidebar.write(state.r, " out of ", matches)
 totalclusters = pivots
 def drawtable(tableout):
     st.table(tableout)
@@ -150,7 +152,6 @@ def tableReports(tablout, rows, clusters, pivots, matches):
 table_OUT = table_prepped
 
 while state.j < pivots:
-    st.write(tablePivots())
     pivot = tablePivots().loc[state.j]
     matchid = pivot['RECORD_ID']
     table_matches = prepmatches(matchid)

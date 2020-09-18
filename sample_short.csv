@@ -8,7 +8,7 @@ CLUSTER_ID,MATCH_ID,RECORD_ID,PIVOT,MATCH_COUNT,LAST_NAME,MIDDLE_INITIAL,FIRST_N
 123185,123189,123143,,3,STONE,S,ALEX,NOT HERE,M,2/2/1936,,alex.lead@email.com,,,,,,,,
 123989,123989,123989,,1,DUNPHY,M,PHIL,CALIFORNIA,M,10/6/1947,,phildunphy@emil.com,,,,,,,,
 123989,123989,123999,,1,DUNPHY,M,PHIL,CALIFORNIA,M,10/6/1947,,phildunphy@emil.com,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,
+,,,,,DUNPHY,M,Shane,CALIFORNIA,M,1/1/1991,,shanedunphy@asdf.com,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,check matchid != cluster. ,,,,,,,,,,,
