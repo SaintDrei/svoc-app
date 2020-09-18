@@ -10,8 +10,8 @@ import base64
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
-# , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
+# , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 
 # Sidebar
 st.sidebar.subheader("Steward")
@@ -19,17 +19,17 @@ stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "
 stewardName = st.sidebar.selectbox(
     'Select steward username',
      stewardlist)
-approvalstatus = ""
+approval = ""
 st.sidebar.subheader("Upload CSV File")
 file_CSV = st.sidebar.file_uploader("Drag file here or click browse files", type=["csv"])
 
 remark = st.sidebar.text_input("Remarks")
 if st.sidebar.button("Approve"):
-    approvalstatus = "APPROVED"
+    approval = "APPROVED"
 else:
     pass
 if st.sidebar.button("Reject"):
-    approvalstatus = "REJECTED"
+    approval = "REJECTED"
 else:
     pass
 
@@ -47,7 +47,7 @@ def prep_csv():
         
 
 def count_clusters(x):
-    counts = x["APPROVAL"].value_counts()
+    counts = x["STEWARD_APPROVAL"].value_counts()
     y = counts.iloc[0]
     return y
 
@@ -63,9 +63,9 @@ def count_matches(x):
 table_prepped = prep_csv()
 state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0)
     
-def writeRow(row, approvalstatus, prev, table_OUT):   
+def writeRow(row, approval, prev, table_OUT):   
     towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
-    towrite.APPROVAL = approvalstatus
+    towrite.STEWARD_APPROVAL = approval
     towrite.DATE_APPROVED = datetime.now()
     towrite.STEWARD = stewardName
     towrite.TIME_TAKEN = datetime.now() - prev
@@ -74,14 +74,14 @@ def writeRow(row, approvalstatus, prev, table_OUT):
 def writePivot(pivot):
     pivot.STEWARD = stewardName
     pivot.DATE_APPROVED = datetime.now()
-    pivot.APPROVAL = "PIVOT"
+    pivot.STEWARD_APPROVAL = "PIVOT"
     state.tablout = state.tablout.append(pivot, ignore_index=True)
 
 
-def modRow(record, approvalstatus, taken, remarks):
+def modRow(record, approval, taken, remarks):
     record.STEWARD = stewardName
     record.DATE_APPROVED = datetime.now()
-    record.APPROVAL = approvalstatus
+    record.STEWARD_APPROVAL = approval
     record.TIME_TAKEN = taken
     record.REMARKS = remarks
     state.tablout = state.tablout.append(record, ignore_index = True)
@@ -93,18 +93,13 @@ totalrows = len(table_prepped.index)
 
 
 
-table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
+table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING")] 
 
-table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 def tablePivots():    
     i = 0
     for index, row in table_pivots.iterrows():
-        if pd.isnull(row.PIVOT) == True:
-        #if (row.PIVOT != "PIVOT") & (row.PIVOT != "SIBLING"):
-            row.PIVOT = "PIVOT"
-        else:
-            pass
-        row.APPROVAL = "PIVOT"
+        row.STEWARD_APPROVAL = "PIVOT"
         row.STEWARD = stewardName
         row.DATE_APPROVED = datetime.now()
         row.TIME_TAKEN = 0
@@ -122,7 +117,7 @@ def drawtable(tableout):
 def prepmatches(matchid):
     table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
     i = 0
-    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "STEWARD_APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
     
     for index, row in table_matches.iterrows():
         table_matches_prepped.loc[i] = row
@@ -150,7 +145,6 @@ def tableReports(tablout, rows, clusters, pivots, matches):
 table_OUT = table_prepped
 
 while state.j < pivots:
-    st.write(tablePivots())
     pivot = tablePivots().loc[state.j]
     matchid = pivot['RECORD_ID']
     table_matches = prepmatches(matchid)
@@ -162,11 +156,11 @@ while state.j < pivots:
         outable = pd.concat([pivot, match], axis = 1)
         st.write("Match iteration " + str(state.k))
  
-        if approvalstatus =="":
+        if approval =="":
             st.table(outable)
             
             ttaken = st.text("Time taken: " + str(state.taken))
-            while approvalstatus == "":
+            while approval == "":
                 time.sleep(.5)
                 state.t += 1
                 state.taken += 0.5
@@ -176,9 +170,9 @@ while state.j < pivots:
                 pass
                 
         else:
-            modRow(match, approvalstatus, state.taken, remark)
+            modRow(match, approval, state.taken, remark)
             state.taken = 0
-            approvalstatus = ""
+            approval = ""
             remark = ""
             state.k += 1
             state.r += 1

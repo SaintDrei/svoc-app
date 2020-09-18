@@ -6,6 +6,14 @@ Python streamlit app for SVOC approval facilitation.
 * Create BAT files for setup, init
 * Separate rendering of view dependent on filtering or first approval.
 * Optimize program by creating functions
+* Fix preparePivots() to scan for unmarked pivots by selecting recordid==matchid==recordid and recordid==matchid:
+    * Prepare Cluster Table
+    * check for records with matchid!=clusterid
+    * get the record with matchid==recordid
+    * tag as sibling and pass to pivots table
+* Create separate Second Approval Script to:
+    * Replace Approval writing
+    * Additional Checkbox to tag Errors  or autotag them based on changes
 
 ## Optional Features
 * Include dupe highlighting for QOL(Easier match spotting by glance)
@@ -14,6 +22,8 @@ Python streamlit app for SVOC approval facilitation.
 * Stylized UI, colors for approve and reject button
 * Progress bar to ~~show rows completed out of total matched_rows~~
 * Allow edits during Cluster Review
+* Create checkboxes for common remarks
+
 
 ## Bugs
 * Duplicate Next Button

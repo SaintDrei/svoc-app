@@ -54,3 +54,29 @@ print pivot & match to table
 print table
 apply approve & metadata
 push row to export_df
+
+PROBLEM: Some pivots aren't tagged as pivots
+Missing 
+
+1.) get clustercount from CLUSTER_ID
+2.) for each clustercount generate a clustertable
+3.) 
+
+1.) Get all matching rows and put them in matching table based on MATCH_ID
+2.) Get all tables with MATCH_ID != CLUSTER_ID
+3.) Get row where RECORD_ID == MATCH_ID
+4.) Tag it as Pivot
+5.) Add to prepped table.
+6.) 
+
+1.) get all pivots
+2.) put them in a pivot table
+3.) for each pivot, get all matching rows with same MATCH_ID
+    and put them in a matches table.
+4.) Compare pivot table to matches table by MATCH_ID.
+5.) Join the pivot and matches to cluster table, 
+    add that to main table.
+6.) Repeat til all pivots are matched.
+7.) Save master table.
+
+
