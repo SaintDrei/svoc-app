@@ -171,7 +171,6 @@ while state.j < pivots:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
         st.write("Match iteration " + str(state.k))
-        st.write(table_prepped)
         if approvalstatus =="":
             st.table(outable)
             
