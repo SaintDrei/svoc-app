@@ -10,8 +10,8 @@ import base64
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
-data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
-# , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
+# , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 
 # Sidebar
 st.sidebar.subheader("Steward")
@@ -87,21 +87,23 @@ def modRow(record, approvalstatus, taken, remarks):
     state.tablout = state.tablout.append(record, ignore_index = True)
 
 table_transposed = table_prepped.T
-matches = count_matches(table_prepped.loc[table_prepped["PIVOT"].isnull()])
+matches = count_matches(table_prepped.loc[table_prepped["PIVOT_MARK"].isnull()])
 
 totalrows = len(table_prepped.index)
 totalcrows = len(table_prepped.loc[(table_prepped["CLUSTER_ID"].isnull() == False)])
 
 
-table_pivots = table_prepped.loc[(table_prepped['PIVOT'] == "PIVOT") | (table_prepped['PIVOT'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
+table_pivots = table_prepped.loc[(table_prepped['PIVOT_MARK'] == "PIVOT") | (table_prepped['PIVOT_MARK'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
 
-table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 def tablePivots():    
     i = 0
     for index, row in table_pivots.iterrows():
-        if pd.isnull(row.PIVOT) == True:
-        #if (row.PIVOT != "PIVOT") & (row.PIVOT != "SIBLING"):
-            row.PIVOT = "PIVOT"
+        if pd.isnull(row.PIVOT_MARK) == True:
+        #if (row.PIVOT_MARK != "PIVOT_MARK") & (row.PIVOT_MARK != "SIBLING"):
+            rowid = row.RECORD_ID
+            row.PIVOT_MARK = "PIVOT"
+            
         else:
             pass
         row.APPROVAL = "PIVOT"
@@ -111,6 +113,13 @@ def tablePivots():
         table_new.loc[i] = row
         i+=1
     else:
+        i = 0
+        for index, row in table_pivots.iterrows():
+            if pd.isnull(row.PIVOT_MARK) == True:
+                tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == rowid)]
+                tocheck["PIVOT_MARK"] = "PIVOT"
+                table_prepped.update(tocheck)       
+            else: pass
         return table_new
 
 pivots = count_clusters(tablePivots())
@@ -122,9 +131,9 @@ totalclusters = pivots
 def drawtable(tableout):
     st.table(tableout)
 def prepmatches(matchid):
-    table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT"] != "PIVOT") & (table_prepped["PIVOT"] != "SIBLING")]
+    table_matches = table_prepped.loc[(table_prepped["MATCH_ID"] == matchid) & (table_prepped["PIVOT_MARK"] != "PIVOT") & (table_prepped["PIVOT_MARK"] != "SIBLING")]
     i = 0
-    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+    table_matches_prepped =  pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
     
     for index, row in table_matches.iterrows():
         table_matches_prepped.loc[i] = row
@@ -162,7 +171,7 @@ while state.j < pivots:
         match = table_matches.loc[state.k]
         outable = pd.concat([pivot, match], axis = 1)
         st.write("Match iteration " + str(state.k))
- 
+        st.write(table_prepped)
         if approvalstatus =="":
             st.table(outable)
             
