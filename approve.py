@@ -102,7 +102,7 @@ def checkuntagged():
         k = 0
         matches = table_prepped["MATCH_ID"].unique()
         for match in matches:
-            
+            row = table_prepped.loc[(table_prepped["RECORD_ID"])]
             try:
                 tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == match)]
                 #tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == rowid)]
