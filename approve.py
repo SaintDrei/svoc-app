@@ -93,6 +93,34 @@ totalrows = len(table_prepped.index)
 totalcrows = len(table_prepped.loc[(table_prepped["CLUSTER_ID"].isnull() == False)])
 
 
+def checkuntagged():
+    i = 0
+    clusters = table_prepped["CLUSTER_ID"].unique()
+    for cluster in clusters:
+        table_matches = table_prepped.loc[(table_prepped["CLUSTER_ID"] == cluster) & (table_prepped["PIVOT_MARK"] != "PIVOT") & (table_prepped["PIVOT_MARK"] != "SIBLING")]
+        matchto = count_matches(table_matches)
+        k = 0
+        matches = table_prepped["MATCH_ID"].unique()
+        for match in matches:
+            
+            try:
+                tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == match)]
+                #tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == rowid)]
+                #tocheck["PIVOT_MARK"] = "PIVOT"
+                #table_prepped.update(tocheck)       
+                
+                if tocheck[""]
+                tocheck["PIVOT_MARK"] = "SIBLING"
+                table_prepped.update(tocheck)
+            except:
+                tocheck["APPROVAL"] = "ORPHAN"
+    else:
+        pass
+
+    
+
+
+
 table_pivots = table_prepped.loc[(table_prepped['PIVOT_MARK'] == "PIVOT") | (table_prepped['PIVOT_MARK'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
 
 table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
@@ -113,7 +141,6 @@ def tablePivots():
         table_new.loc[i] = row
         i+=1
     else:
-        i = 0
         for index, row in table_pivots.iterrows():
             if pd.isnull(row.PIVOT_MARK) == True:
                 tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == rowid)]
@@ -158,6 +185,8 @@ def tableReports(tablout, rows, clusters, pivots, matches):
     report = pd.DataFrame(data, columns=["DATE FINISHED", "ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "TIME_TAKEN"])
     return report
 
+checkuntagged()
+st.write(table_prepped)
 table_OUT = table_prepped
 
 while state.j < pivots:
