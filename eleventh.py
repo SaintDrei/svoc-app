@@ -55,11 +55,13 @@ def count_matches(x):
     y = x["MATCH_ID"].value_counts()
     return y.sum(axis=0)
 
+
+
         
 # Variables
 
 table_prepped = prep_csv()
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0, untagged = 0, orphans = 0)
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0)
     
 def writeRow(row, approvalstatus, prev, table_OUT):   
     towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
@@ -113,32 +115,32 @@ def checkuntagged():
                     if (tocluster == torecord):
                         checkutpivot(tocheck)
                     else:
-                        if tocheck.iloc[0]["PIVOT_MARK"] == "SIBLING":
-                            pass
-                        else:
-                            tocheck["PIVOT_MARK"] = "SIBLING"
-                            table_prepped.update(tocheck)
-                            table_untagged.update(tocheck)
+                        tocheck["PIVOT_MARK"] = "SIBLING"
+                        table_prepped.update(tocheck)
                 except:
                     push = table_prepped.loc[table_prepped["RECORD_ID"] == row.RECORD_ID]
                     push.APPROVAL = "ORPHAN"
-                    state.orphans = state.orphans + 1
                     table_prepped.update(push) 
-                    table_orphans.update(push)
     else:
         pass
 
     
 
-table_untagged = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
-table_orphans = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
-checkuntagged()
+
+
 table_pivots = table_prepped.loc[(table_prepped['PIVOT_MARK'] == "PIVOT") | (table_prepped['PIVOT_MARK'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
 
 table_new = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 def tablePivots():    
     i = 0
     for index, row in table_pivots.iterrows():
+        if pd.isnull(row.PIVOT_MARK) == True:
+        #if (row.PIVOT_MARK != "PIVOT_MARK") & (row.PIVOT_MARK != "SIBLING"):
+            rowid = row.RECORD_ID
+            row.PIVOT_MARK = "PIVOT"
+            
+        else:
+            pass
         row.APPROVAL = "PIVOT"
         row.STEWARD = stewardName
         row.DATE_APPROVED = datetime.now()
@@ -150,11 +152,11 @@ def tablePivots():
             if pd.isnull(row.PIVOT_MARK) == True:
                 tocheck = table_prepped.loc[(table_prepped["RECORD_ID"] == rowid)]
                 tocheck["PIVOT_MARK"] = "PIVOT"
-                table_untagged.update(tocheck)
-                table_prepped.update(tocheck)
+                table_prepped.update(tocheck)       
             else: pass
         return table_new
 
+checkuntagged()
 pivots = count_clusters(tablePivots())
 totalpivots = len(table_pivots.index)
 totalmatch = matches + totalpivots
@@ -190,12 +192,10 @@ def tableReports(tablout, rows, clusters, pivots, matches):
     data = [[finishdate, rows, clusters, pivots, matches, taken]]
     report = pd.DataFrame(data, columns=["DATE FINISHED", "ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "TIME_TAKEN"])
     return report
-st.write("Untagged: " + str(len(table_untagged)))
-st.write(table_untagged)
-st.write("Orphans: " + str(len(table_orphans)))
-st.write(table_orphans)
-st.write(tablePivots())
+
 st.write(table_prepped)
+table_OUT = table_prepped
+
 while state.j < pivots:
     pivot = tablePivots().loc[state.j]
     matchid = pivot['RECORD_ID']
