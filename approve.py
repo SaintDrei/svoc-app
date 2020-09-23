@@ -13,6 +13,8 @@ st.set_option('deprecation.showfileUploaderEncoding', False)
 data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"]]
 # , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 
+table_untagged = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
+table_orphans = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 # Sidebar
 st.sidebar.subheader("Steward")
 stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "MMarcos", "RVillareal"]
@@ -130,8 +132,6 @@ def checkuntagged():
 
     
 
-table_untagged = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
-table_orphans = pd.DataFrame(data, columns=["CLUSTER_ID","MATCH_ID","RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "REMARKS", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 checkuntagged()
 table_pivots = table_prepped.loc[(table_prepped['PIVOT_MARK'] == "PIVOT") | (table_prepped['PIVOT_MARK'] == "SIBLING") | (table_prepped['RECORD_ID'] == table_prepped['MATCH_ID'])] 
 
