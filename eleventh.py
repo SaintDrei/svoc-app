@@ -40,13 +40,16 @@ else:
     fname = st.sidebar.checkbox("Diff First Name", value="", key="fname" + str(state.textkey))
     lname = st.sidebar.checkbox("Diff Last Name", value="", key="lname" + str(state.textkey))
     minitial = st.sidebar.checkbox("Diff Middle Initial", value="", key="minitial" + str(state.textkey))
-    bdate = st.sidebar.checkbox("Diff Middle Initial", value="", key="bdate" + str(state.textkey))
+    address = st.sidebar.checkbox("Diff Address", value="", key="address" + str(state.textkey))
+    bdate = st.sidebar.checkbox("Diff Birthdate", value="", key="bdate" + str(state.textkey))
     if fname:
         remark = remark + " DLN, "
     if lname:
         remark = remark + " DFN,"
     if minitial:
         remark = remark + " DMI,"
+    if address:
+        remark = remark + " DADD,"
     if bdate:
         remark = remark + " DBD,"
 
@@ -219,8 +222,13 @@ def get_download(df):
 def tableReports(tablout, rows, clusters, pivots, matches):
     finishdate = datetime.now()
     taken = tablout['TIME_TAKEN'].sum()
-    data = [[finishdate, rows, clusters, pivots, matches, taken]]
-    report = pd.DataFrame(data, columns=["DATE FINISHED", "ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "TIME_TAKEN"])
+    orphans = tablout.loc[tablout["APPROVAL"] == "ORPHAN"].count()
+    untagged = tablout.loc[tablout["APPROVAL"] == "ORPHAN"].count()
+    approves = tablout.loc[tablout["APPROVAL"] == "APPROVED"].count()
+    rejects = tablout.loc[tablout["APPROVAL"] == "REJECTED"].count()
+
+    data = [[finishdate, rows, clusters, pivots, matches, untagged, orphans, approves, rejects, taken]]
+    report = pd.DataFrame(data, columns=["DATE FINISHED", "ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "UNTAGGED", "ORPHANS", "APPROVED", "REJECTED", "TIME_TAKEN"])
     return report
 
 table_OUT = table_prepped
