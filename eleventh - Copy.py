@@ -14,64 +14,33 @@ data = [["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAS
 # , tablout = pd.DataFrame(["0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"], columns=["CLUSTER_ID","MATCH_ID",	"RECORD_ID", "PIVOT_MARK", "MATCH_COUNT", "LAST_NAME", "MIDDLE_INITIAL", "FIRST_NAME",	"COMPLETE_ADDRESS",	"SEX",	"BIRTHDATE", "MOBILE_NUMBER", "EMAIL", "TIN", "STEWARD", "APPROVAL", "APPROVAL_COUNT", "DATE_APPROVED", "TIME_TAKEN", "APPROVER", "SECOND_APPROVAL_DATE"])
 
 # Sidebar
-
-state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0, textkey=0, loaded = 0, sname = "Nobody", csvfile = pd.DataFrame())
+st.sidebar.subheader("Steward")
 stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "MMarcos", "RVillareal"]
-approvalstatus = ""
-remark = ""
-if state.loaded == 0:
-    st.sidebar.subheader("Steward")
-    state.sname = st.sidebar.selectbox(
+stewardName = st.sidebar.selectbox(
     'Select steward username',
      stewardlist)
-    st.sidebar.subheader("Upload CSV File")
-    prep_CSV = st.sidebar.file_uploader("Drag file here or click browse files", type=["csv"])
-    try:
-        state.csvfile = pd.read_csv(prep_CSV)
-    except:
-        st.markdown("<font color='red'><strong>Please upload CSV on the sidebar</strong></font>", unsafe_allow_html=True)        
-    if prep_CSV:
-        state.loaded += 1
-    else:
-        pass
+approvalstatus = ""
+st.sidebar.subheader("Upload CSV File")
+file_CSV = st.sidebar.file_uploader("Drag file here or click browse files", type=["csv"])
+
+remark = st.sidebar.text_input("Remarks")
+if st.sidebar.button("Approve"):
+    approvalstatus = "APPROVED"
 else:
-    st.sidebar.subheader("Welcome, " + state.sname + "!")
-    remark = st.sidebar.text_input("Remarks", remark, key=state.textkey)
-    fname = st.sidebar.checkbox("Diff First Name", value="", key="fname" + str(state.textkey))
-    lname = st.sidebar.checkbox("Diff Last Name", value="", key="lname" + str(state.textkey))
-    minitial = st.sidebar.checkbox("Diff Middle Initial", value="", key="minitial" + str(state.textkey))
-    bdate = st.sidebar.checkbox("Diff Middle Initial", value="", key="bdate" + str(state.textkey))
-    if fname:
-        remark = remark + " DLN, "
-    if lname:
-        remark = remark + " DFN,"
-    if minitial:
-        remark = remark + " DMI,"
-    if bdate:
-        remark = remark + " DBD,"
-
-    if st.sidebar.button("Approve"):
-        approvalstatus = "APPROVED"
-        state.textkey +=1
-    else:
-        pass
-    if st.sidebar.button("Reject"):
-        approvalstatus = "REJECTED"
-        state.textkey +=1
-    else:
-        pass
-
+    pass
+if st.sidebar.button("Reject"):
+    approvalstatus = "REJECTED"
+else:
+    pass
 
 # Sidebar end
 
 #Functions
 st.title("SVOC Data Steward Approval Tool")
-st.markdown("""
-Please select steward name from the list on the sidebar.
-""")
+'Welcome ', stewardName, '!'
 def prep_csv():
     try:
-        table_CSV = pd.read_csv(state.csvfile)        
+        table_CSV = pd.read_csv(file_CSV)        
         return table_CSV
     except:
         return st.markdown("<font color='red'><strong>Please upload CSV on the sidebar</strong></font>", unsafe_allow_html=True)
@@ -90,26 +59,27 @@ def count_matches(x):
 
         
 # Variables
-table_prepped = state.csvfile
-#table_prepped = prep_csv()
+
+table_prepped = prep_csv()
+state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFrame(), taken = 0)
     
 def writeRow(row, approvalstatus, prev, table_OUT):   
     towrite =  table_OUT.loc[table_OUT['RECORD_ID'] == row.RECORD_ID]
     towrite.APPROVAL = approvalstatus
     towrite.DATE_APPROVED = datetime.now()
-    towrite.STEWARD = state.sname
+    towrite.STEWARD = stewardName
     towrite.TIME_TAKEN = datetime.now() - prev
     st.write(towrite)
 
 def writePivot(pivot):
-    pivot.STEWARD = state.sname
+    pivot.STEWARD = stewardName
     pivot.DATE_APPROVED = datetime.now()
     pivot.APPROVAL = "PIVOT"
     state.tablout = state.tablout.append(pivot, ignore_index=True)
 
 
 def modRow(record, approvalstatus, taken, remarks):
-    record.STEWARD = state.sname
+    record.STEWARD = stewardName
     record.DATE_APPROVED = datetime.now()
     record.APPROVAL = approvalstatus
     record.TIME_TAKEN = taken
@@ -172,7 +142,7 @@ def tablePivots():
         else:
             pass
         row.APPROVAL = "PIVOT"
-        row.STEWARD = state.sname
+        row.STEWARD = stewardName
         row.DATE_APPROVED = datetime.now()
         row.TIME_TAKEN = 0
         table_new.loc[i] = row
@@ -223,6 +193,7 @@ def tableReports(tablout, rows, clusters, pivots, matches):
     report = pd.DataFrame(data, columns=["DATE FINISHED", "ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "TIME_TAKEN"])
     return report
 
+st.write(table_prepped)
 table_OUT = table_prepped
 
 while state.j < pivots:
@@ -238,6 +209,7 @@ while state.j < pivots:
         st.write("Match iteration " + str(state.k))
         if approvalstatus =="":
             st.table(outable)
+            
             ttaken = st.text("Time taken: " + str(state.taken))
             while approvalstatus == "":
                 time.sleep(.5)
