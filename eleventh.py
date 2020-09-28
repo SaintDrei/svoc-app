@@ -19,6 +19,9 @@ state = SessionState.get(j = 0, t = 0,ta = 0, k = 0, r = 0, tablout = pd.DataFra
 stewardlist = ["ADSantos", "ASRicamara", "KManingat", "LPalabay", "MAlvarado", "MMarcos", "RVillareal"]
 approvalstatus = ""
 remark = ""
+st.write("Pre, " + str(state.loaded))
+#def renderSide():    w
+
 if state.loaded == 0:
     st.sidebar.subheader("Steward")
     state.sname = st.sidebar.selectbox(
@@ -64,7 +67,7 @@ else:
     else:
         pass
 
-
+st.write("Post " + str(state.loaded))
 # Sidebar end
 
 #Functions
@@ -72,12 +75,12 @@ st.title("SVOC Data Steward Approval Tool")
 st.markdown("""
 Please select steward name from the list on the sidebar.
 """)
-def prep_csv():
-    try:
-        table_CSV = pd.read_csv(state.csvfile)        
-        return table_CSV
-    except:
-        return st.markdown("<font color='red'><strong>Please upload CSV on the sidebar</strong></font>", unsafe_allow_html=True)
+#def prep_csv():
+ #   try:
+  #      table_CSV = pd.read_csv(state.csvfile)        
+   #     return table_CSV
+    #except:
+     #   return st.markdown("<font color='red'><strong>Please upload CSV on the sidebar</strong></font>", unsafe_allow_html=True)
         
 
 def count_clusters(x):
