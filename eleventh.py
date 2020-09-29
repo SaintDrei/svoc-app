@@ -72,9 +72,9 @@ st.write("Post " + str(state.loaded))
 
 #Functions
 st.title("SVOC Data Steward Approval Tool")
-st.markdown("""
-Please select steward name from the list on the sidebar.
-""")
+#st.markdown("""
+#Please select steward name from the list on the sidebar.
+#""")
 #def prep_csv():
  #   try:
   #      table_CSV = pd.read_csv(state.csvfile)        
@@ -155,6 +155,7 @@ def checkuntagged():
                         table_prepped.update(tocheck)
                 except:
                     push = table_prepped.loc[table_prepped["RECORD_ID"] == row.RECORD_ID]
+                    push.TIME_TAKEN = 0
                     push.APPROVAL = "ORPHAN"
                     table_prepped.update(push) 
     else:
@@ -225,14 +226,21 @@ def get_download(df):
 def tableReports(tablout, rows, clusters, pivots, matches):
     finishdate = datetime.now()
     taken = tablout['TIME_TAKEN'].sum()
-    orphans = tablout.loc[tablout["APPROVAL"] == "ORPHAN"].count()
-    untagged = tablout.loc[tablout["APPROVAL"] == "ORPHAN"].count()
-    approves = tablout.loc[tablout["APPROVAL"] == "APPROVED"].count()
-    rejects = tablout.loc[tablout["APPROVAL"] == "REJECTED"].count()
+    
+    orphans = len(tablout.loc[tablout["APPROVAL"] == "ORPHAN"])
+    untagged = "NA"
+    #untagged = len(tablout.loc[tablout["APPROVAL"] == "ORPHAN"])
+    approves = len(tablout.loc[tablout["APPROVAL"] == "APPROVED"])
+    rejects = len(tablout.loc[tablout["APPROVAL"] == "REJECTED"])
 
     data = [[finishdate, rows, clusters, pivots, matches, untagged, orphans, approves, rejects, taken]]
     report = pd.DataFrame(data, columns=["DATE FINISHED", "ROWS", "CLUSTERS", "PIVOTS", "MATCHES", "UNTAGGED", "ORPHANS", "APPROVED", "REJECTED", "TIME_TAKEN"])
     return report
+
+def generateCSV():
+    orphanitos = table_prepped.loc[table_prepped["APPROVAL"] == "ORPHAN"]
+    state.tablout = state.tablout.append(orphanitos, ignore_index=True)
+    return st.markdown(get_download(state.tablout), unsafe_allow_html=True)
 
 table_OUT = table_prepped
 
@@ -298,7 +306,9 @@ while state.j < pivots:
             
                  
 else:
+    st.write(state.tablout)
+
     st.write("All matches complete!")
     st.table(tableReports(state.tablout, totalrows, totalclusters, totalpivots, totalmatch))
-    st.markdown(get_download(state.tablout), unsafe_allow_html=True)
+    generateCSV()
     #PRINT OUT report data
